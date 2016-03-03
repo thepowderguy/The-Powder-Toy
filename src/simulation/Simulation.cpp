@@ -3216,6 +3216,15 @@ int Simulation::create_part(int p, int x, int y, int t, int v)
 				parts[i].tmp2 = 4;
 				break;
 			}
+			case PT_FISS:
+			{
+				parts[i].life = 1+(rand()%2);
+				break;
+			}
+			case PT_FSPR:
+			{
+				parts[i].life = 1+rand()%2;
+			}
 			default:
 				break;
 		}
