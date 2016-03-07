@@ -1976,7 +1976,7 @@ void Simulation::init_can_move()
 	//photons go through everything by default
 	for (destinationType = 1; destinationType < PT_NUM; destinationType++)
 		can_move[PT_PHOT][destinationType] = 2;
-
+	
 	for (movingType = 1; movingType < PT_NUM; movingType++)
 	{
 		for (destinationType = 1; destinationType < PT_NUM; destinationType++)
@@ -1998,6 +1998,7 @@ void Simulation::init_can_move()
 				can_move[movingType][destinationType] = 2;
 		}
 	}
+	
 	for (destinationType = 0; destinationType < PT_NUM; destinationType++)
 	{
 		//set what stickmen can move through
@@ -2037,6 +2038,7 @@ void Simulation::init_can_move()
 		{
 			can_move[movingType][PT_VIBR] = 1;
 			can_move[movingType][PT_BVBR] = 1;
+			can_move[movingType][PT_RDAB] = 1;
 		}
 	}
 	//a list of lots of things PHOT can move through
@@ -2053,6 +2055,7 @@ void Simulation::init_can_move()
 		{
 			can_move[PT_PROT][destinationType] = 2;
 			can_move[PT_GRVT][destinationType] = 2;
+			can_move[PT_GMMA][destinationType] = 2;
 		}
 	}
 
@@ -2085,6 +2088,11 @@ void Simulation::init_can_move()
 	can_move[PT_THDR][PT_THDR] = 2;
 	can_move[PT_EMBR][PT_EMBR] = 2;
 	can_move[PT_TRON][PT_SWCH] = 3;
+	
+	
+	can_move[PT_GMMA][PT_DMND] = 2;
+	can_move[PT_GMMA][PT_INSL] = 2;
+	
 }
 
 /*
@@ -2340,7 +2348,15 @@ int Simulation::try_move(int i, int x, int y, int nx, int ny)
 			return 0;
 		}
 	}
-
+	else if ((r&0xFF)==PT_RDAB)
+	{
+		if ((elements[parts[i].type].Properties & TYPE_ENERGY) && parts[i].type != PT_GMMA)
+		{
+			parts[r>>8].temp += 1000.0f;
+			kill_part(i);
+			return 0;
+		}
+	}
 	if (parts[i].type == PT_NEUT)
 	{
 		if (elements[r & 0xFF].Properties & PROP_NEUTABSORB)
@@ -3223,7 +3239,16 @@ int Simulation::create_part(int p, int x, int y, int t, int v)
 			}
 			case PT_FSPR:
 			{
-				parts[i].life = 1+rand()%2;
+				parts[i].life = rand()%3;
+				break;
+			}
+			case PT_GMMA:
+			{
+				float a = (rand()%360)*3.14159f/180.0f;
+				parts[i].life = 680;
+				parts[i].vx = 3.0f*cosf(a);
+				parts[i].vy = 3.0f*sinf(a);
+				break;
 			}
 			default:
 				break;

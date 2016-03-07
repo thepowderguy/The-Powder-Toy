@@ -1,10 +1,10 @@
 #include "simulation/Elements.h"
-//#TPT-Directive ElementClass Element_FSPR PT_FSPR 601
+//#TPT-Directive ElementClass Element_FSPR PT_FSPR 181
 Element_FSPR::Element_FSPR()
 {
 	Identifier = "DEFAULT_PT_FSPR";
 	Name = "FSPR";
-	Colour = PIXPACK(0x808080);
+	Colour = PIXPACK(0x303030);
 	MenuVisible = 1;
 	MenuSection = SC_NUCLEAR;
 	Enabled = 1;
@@ -47,6 +47,13 @@ Element_FSPR::Element_FSPR()
 //#TPT-Directive ElementHeader Element_FSPR static int update(UPDATE_FUNC_ARGS)
 int Element_FSPR::update(UPDATE_FUNC_ARGS)
 {
+	if ((sim->photons[y][x] & 0xFF) == PT_NEUT && !(rand()%40)) {
+		sim->kill_part(sim->photons[y][x] >> 8);
+	}
+	if (parts[i].life > 0 && !(rand()%10000)) {
+		sim->create_part(-3, x, y, PT_GMMA);
+		parts[i].life--;
+	}
 	return 0;
 }
 

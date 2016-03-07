@@ -65,6 +65,13 @@ int Element_NEUT::update(UPDATE_FUNC_ARGS)
 					parts[i].vx *= 0.995;
 					parts[i].vy *= 0.995;
 					break;
+				case PT_MODR:
+				case PT_GPHT:
+					if (parts[i].vx*parts[i].vx+parts[i].vy*parts[i].vy > 0.33*0.33) {
+						parts[i].vx *= 0.995;
+						parts[i].vy *= 0.995;
+					}
+					break;
 				case PT_PLUT:
 					if (pressureFactor>(rand()%1000))
 					{
