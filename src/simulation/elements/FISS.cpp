@@ -53,7 +53,8 @@ int Element_FISS::update(UPDATE_FUNC_ARGS)
 		sim->create_part(-3, x, y, PT_GMMA);
 	}
 	int npart = sim->photons[y][x];
-	if (!rand()%100000 || ((npart & 0xFF) == PT_NEUT && /*!(rand()%((80+parts[i].life)/(parts[i].life+1)))*/!(rand()%NeutInteractionChance(sim, npart >> 8))))
+	float velocity;
+	if (!rand()%100000 || ((npart & 0xFF) == PT_NEUT && !(rand()%NeutInteractionChance(sim, npart >> 8, &velocity))))
 	{
 		if (parts[i].life == 0) {
 			sim->part_change_type(i, x, y, PT_FSPR);
@@ -61,15 +62,9 @@ int Element_FISS::update(UPDATE_FUNC_ARGS)
 		} else {
 			parts[i].life--;
 		}
-		sim->kill_part(npart);
-		//for (int rx = -1; rx <= 1; rx++) {
-		//	for (int ry = -1; ry <= 1; ry++) {
-		//		if (BOUNDS_CHECK) {
-					parts[i].temp = MAX_TEMP;
-		//		}
-		//	}
-		//}
-		sim->pv[y/CELL][x/CELL] += 4.0 * CFDS;
+		sim->kill_part(npart >> 8);
+		parts[i].temp = MAX_TEMP;
+		sim->pv[y/CELL][x/CELL] += (4.0 + fmin(velocity*6.0, 16.0)) * CFDS;
 		parts[sim->create_part(-3, x, y, PT_NEUT)].temp = MAX_TEMP;
 		parts[sim->create_part(-3, x, y, PT_NEUT)].temp = MAX_TEMP;
 		Element_FIRE::update(UPDATE_FUNC_SUBCALL_ARGS);
@@ -78,9 +73,10 @@ int Element_FISS::update(UPDATE_FUNC_ARGS)
 	return 0;
 }
 
-//#TPT-Directive ElementHeader Element_FISS static int NeutInteractionChance(Simulation* sim, int pid)
-int Element_FISS::NeutInteractionChance(Simulation* sim, int pid) {
-	return 20.0f*(3.0f-2.0f/(1.0f+0.5f*sqrt((sim->parts[pid].vx)*(sim->parts[pid].vx)+(sim->parts[pid].vy)*(sim->parts[pid].vy))));
+//#TPT-Directive ElementHeader Element_FISS static int NeutInteractionChance(Simulation* sim, int pid, float* velocity)
+int Element_FISS::NeutInteractionChance(Simulation* sim, int pid, float* velocity) {
+	*velocity = sqrt((sim->parts[pid].vx)*(sim->parts[pid].vx)+(sim->parts[pid].vy)*(sim->parts[pid].vy));
+	return 20.0f*(3.0f-2.0f/(1.0f+0.5f*(*velocity)));
 }
 
 Element_FISS::~Element_FISS() {}

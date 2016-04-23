@@ -47,13 +47,13 @@ Element_GPHT::Element_GPHT()
 //#TPT-Directive ElementHeader Element_GPHT static int update(UPDATE_FUNC_ARGS)
 int Element_GPHT::update(UPDATE_FUNC_ARGS)
 {
-	if (parts[i].temp > 1000.0f) {
+	if (parts[i].temp > 2000.0f) {
 		bool flam = false;
 		for (int rx = -1; rx <= 1; rx++) {
 			for (int ry = -1; ry <= 1; ry++) {
 				if (BOUNDS_CHECK) {
 					int etype = (pmap[y+ry][x+rx] & 0xFF);
-					if (etype == PT_NONE || etype == PT_O2)
+					if (etype == PT_NONE)
 					{
 						sim->pv[y/CELL][x/CELL] += 0.2*CFDS;
 						if (!(rand()%20)) {

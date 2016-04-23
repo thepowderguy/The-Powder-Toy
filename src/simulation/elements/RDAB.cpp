@@ -38,7 +38,7 @@ Element_RDAB::Element_RDAB()
 	HighPressureTransition = NT;
 	LowTemperature = ITL;
 	LowTemperatureTransition = NT;
-	HighTemperature = 5000.0f;
+	HighTemperature = 4500.0f;
 	HighTemperatureTransition = PT_LAVA;
 
 	Update = &Element_RDAB::update;
